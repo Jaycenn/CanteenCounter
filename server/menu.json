@@ -1,0 +1,10 @@
+[
+  { "id": 1, "name": "Mami", "price": 85, "description": "Served with a boiled egg and Beef meat", "color": "#e11d48" },
+  { "id": 2, "name": "Mami Overload", "price": 150, "description": "Topped with a boiled egg and chicken", "color": "#7c3aed" },
+  { "id": 3, "name": "Arrozcaldo", "price": 75, "description": "If with egg the price is 85", "color": "#d97706" },
+  { "id": 4, "name": "Lelut", "price": 30, "description": "Plain lugaw", "color": "#16a34a" },
+  { "id": 5, "name": "Beef Lelut w Egg", "price": 85, "color": "#b45309" },
+  { "id": 6, "name": "Lelut Overload", "price": 150, "description": "The ultimate porridge loaded with both chicken, beef, and egg", "color": "#db2777" },
+  { "id": 7, "name": "Palabok", "price": 85, "color": "#ea580c" },
+  { "id": 8, "name": "Halo Halo", "price": 75, "color": "#2563eb" }
+]
