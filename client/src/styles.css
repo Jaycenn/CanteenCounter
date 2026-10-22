@@ -1,0 +1,490 @@
+/* ============================================================
+   CanteenCounter — kiosk styles
+   Dark, high-contrast, huge type. Every size uses clamp() so the
+   layout fills a phone, a tablet, or a landscape POS screen.
+   ============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #0b0f14;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* Kiosk behaviour: no text selection, no double-tap zoom, no tap flash,
+     no pull-to-refresh. Taps must feel like hardware buttons. */
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+button {
+  font-family: inherit;
+  border: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* ---------- Register layout: total / grid / actions ---------- */
+
+.register {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+}
+
+.total-bar {
+  flex: 0 0 auto;
+  padding: max(6px, env(safe-area-inset-top)) 16px 10px;
+  background: #000000;
+  text-align: center;
+  transition: background-color 0.15s ease;
+}
+
+.total-bar.is-saved {
+  background: #15803d;
+}
+
+.shop-name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: clamp(0.85rem, 2vw, 1.1rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9ca3af;
+}
+
+.total-bar.is-saved .shop-name,
+.total-bar.is-saved .order-line {
+  color: #dcfce7;
+}
+
+.pending-chip {
+  background: #b45309;
+  color: #ffffff;
+  font-size: 0.8em;
+  font-weight: 800;
+  padding: 2px 10px;
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.total {
+  font-size: clamp(3rem, 13vw, 6rem);
+  font-weight: 900;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+  animation: pop 0.18s ease-out;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(1.07);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.order-line {
+  min-height: 1.4em;
+  font-size: clamp(0.95rem, 2.4vw, 1.3rem);
+  font-weight: 600;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.order-line::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------- Dish grid ---------- */
+
+.dish-grid {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(150px, 26vw, 240px), 1fr));
+  /* rows grow to split the leftover height, so a short menu (like 8 dishes)
+     fills the whole screen; a long one scrolls once rows hit their minimum */
+  grid-auto-rows: minmax(clamp(104px, 16vh, 170px), 1fr);
+  gap: 10px;
+  padding: 10px;
+}
+
+.dish-btn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--dish-color);
+  color: #ffffff;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.4);
+  overflow: hidden;
+}
+
+.dish-btn:active {
+  transform: translateY(3px) scale(0.98);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.4);
+}
+
+.dish-name {
+  font-size: clamp(1.05rem, 2.8vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.35);
+}
+
+.dish-price {
+  font-size: clamp(1.05rem, 2.6vw, 1.5rem);
+  font-weight: 800;
+  background: rgb(0 0 0 / 0.3);
+  padding: 2px 14px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* small serving note under the price — never competes with name/price */
+.dish-desc {
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgb(255 255 255 / 0.85);
+  text-align: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@media (max-height: 500px) {
+  .dish-desc {
+    display: none; /* cramped landscape phones: keep name + price huge */
+  }
+}
+
+/* white overlay that fades out — the “it registered” flash */
+.tap-flash {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #ffffff;
+  pointer-events: none;
+  animation: tap-flash 0.3s ease-out forwards;
+}
+
+@keyframes tap-flash {
+  from {
+    opacity: 0.85;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.count-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #000000;
+  color: #facc15;
+  font-size: clamp(0.95rem, 2.2vw, 1.25rem);
+  font-weight: 900;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Undo / Confirm ---------- */
+
+.action-bar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+}
+
+.undo-btn,
+.confirm-btn {
+  min-height: clamp(72px, 12vh, 120px);
+  border-radius: 18px;
+  font-size: clamp(1.3rem, 4vw, 2.2rem);
+  font-weight: 900;
+  letter-spacing: 0.03em;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.4);
+}
+
+.undo-btn:active:not(:disabled),
+.confirm-btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.4);
+}
+
+.undo-btn {
+  background: #f59e0b;
+  color: #111111;
+}
+
+.confirm-btn {
+  background: #16a34a;
+  color: #ffffff;
+}
+
+.undo-btn:disabled,
+.confirm-btn:disabled {
+  background: #1f2937;
+  color: #4b5563;
+  box-shadow: none;
+  cursor: default;
+}
+
+/* ---------- Loading / error screens ---------- */
+
+.screen-msg {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  font-weight: 700;
+  text-align: center;
+  padding: 20px;
+}
+
+.retry-btn {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: inherit;
+  font-weight: 900;
+  padding: 20px 40px;
+  border-radius: 18px;
+  box-shadow: 0 4px 0 rgb(0 0 0 / 0.4);
+}
+
+/* ---------- PIN pad ---------- */
+
+.pin-screen {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 3vh, 28px);
+  padding: 20px;
+}
+
+.pin-back {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  left: 12px;
+}
+
+.pin-title {
+  margin: 0;
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  font-weight: 800;
+}
+
+.pin-dots {
+  display: flex;
+  gap: 18px;
+}
+
+.pin-dots[data-shake] {
+  animation: shake 0.35s ease-in-out;
+}
+
+@keyframes shake {
+  20% {
+    transform: translateX(-10px);
+  }
+  40% {
+    transform: translateX(10px);
+  }
+  60% {
+    transform: translateX(-6px);
+  }
+  80% {
+    transform: translateX(6px);
+  }
+}
+
+.pin-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #4b5563;
+}
+
+.pin-dot.filled {
+  background: #facc15;
+  border-color: #facc15;
+}
+
+.pin-pad {
+  display: grid;
+  grid-template-columns: repeat(3, clamp(76px, 20vw, 110px));
+  gap: 12px;
+}
+
+.pin-key {
+  height: clamp(76px, 10vh, 110px);
+  border-radius: 50%;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: clamp(1.6rem, 5vw, 2.2rem);
+  font-weight: 800;
+}
+
+.pin-key:active:not(:disabled) {
+  background: #374151;
+}
+
+.pin-key:disabled {
+  background: transparent;
+  cursor: default;
+}
+
+/* ---------- Admin dashboard ---------- */
+
+.admin {
+  min-height: 100dvh;
+  padding: max(12px, env(safe-area-inset-top)) 16px 24px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.admin-header h1 {
+  margin: 0;
+  font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+  font-weight: 800;
+}
+
+.admin-header-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.ghost-btn {
+  background: #1f2937;
+  color: #ffffff;
+  font-size: clamp(0.95rem, 2.2vw, 1.1rem);
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 12px;
+}
+
+.ghost-btn:active {
+  background: #374151;
+}
+
+.admin-error {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fca5a5;
+}
+
+.cash-cards {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.cash-card {
+  background: #111827;
+  border: 2px solid #1f2937;
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cash-label {
+  font-size: clamp(0.9rem, 2.2vw, 1.1rem);
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.cash-value {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  font-weight: 900;
+  color: #4ade80;
+  font-variant-numeric: tabular-nums;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(1rem, 2.6vw, 1.25rem);
+}
+
+.sales-table th {
+  text-align: left;
+  font-weight: 800;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.85em;
+  padding: 10px 12px;
+  border-bottom: 2px solid #1f2937;
+}
+
+.sales-table td {
+  padding: 14px 12px;
+  border-bottom: 1px solid #1f2937;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sales-table th:nth-child(n + 2),
+.sales-table td:nth-child(n + 2) {
+  text-align: right;
+}
+
+.sales-empty {
+  text-align: center !important;
+  color: #6b7280;
+}
+
+@media (max-width: 480px) {
+  .cash-cards {
+    grid-template-columns: 1fr;
+  }
+}
